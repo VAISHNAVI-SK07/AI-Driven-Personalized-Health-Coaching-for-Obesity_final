@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block content %}
+<h3 class="mb-3">Admin Dashboard</h3>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm stat-card">
+            <div class="card-body">
+                <p class="text-muted mb-1">Total Users</p>
+                <h3 class="fw-bold">{{ total_users }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Users BMI &amp; Targets</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Height (cm)</th>
+                            <th>Weight (kg)</th>
+                            <th>BMI</th>
+                            <th>Category</th>
+                            <th>Target Status</th>
+                            <th>Update Target</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for u in user_bmi_records %}
+                        <tr>
+                            <td>{{ u.full_name }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>{{ u.height_cm or '-' }}</td>
+                            <td>{{ u.weight_kg or '-' }}</td>
+                            <td>{{ u.bmi_value or '-' }}</td>
+                            <td>
+                                {% if u.category %}
+                                    <span class="badge bmi-badge bmi-{{ u.category|lower|replace(' ','-') }}">
+                                        {{ u.category }}
+                                    </span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ u.target_status }}</td>
+                            <td>
+                                <form method="post" action="{{ url_for('admin_update_target') }}" class="d-flex gap-1">
+                                    <input type="hidden" name="user_id" value="{{ u.id }}">
+                                    <select name="target_status" class="form-select form-select-sm">
+                                        <option value="Ongoing" {% if u.target_status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
+                                        <option value="Completed" {% if u.target_status == 'Completed' %}selected{% endif %}>Completed</option>
+                                        <option value="Not Completed" {% if u.target_status == 'Not Completed' %}selected{% endif %}>Not Completed</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Recent Login Activity</h6>
+            </div>
+            <div class="card-body small" style="max-height: 260px; overflow-y: auto;">
+                {% for log in login_logs %}
+                    <div class="mb-2">
+                        {% if log.is_admin %}
+                            <span class="badge bg-secondary me-1">Admin</span>
+                            Admin logged in at {{ log.login_time }}
+                        {% else %}
+                            <span class="badge bg-info me-1">User</span>
+                            {{ log.full_name or 'Unknown user' }} ({{ log.email or 'N/A' }})<br>
+                            <span class="text-muted">logged in at {{ log.login_time }}</span>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p class="mb-0 text-muted">No login logs yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Send Motivational Message</h6>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('admin_send_message') }}">
+                    <div class="mb-2">
+                        <label class="form-label">Select User</label>
+                        <select name="user_id" class="form-select form-select-sm" required>
+                            {% for u in user_bmi_records %}
+                                <option value="{{ u.id }}">{{ u.full_name }} ({{ u.email }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Message</label>
+                        <textarea name="message" rows="3" class="form-control" required></textarea>
+                    </div>
+                    <button class="btn btn-success btn-sm w-100" type="submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Today’s Daily Challenge Completion</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Water</th>
+                            <th>Food</th>
+                            <th>Workout</th>
+                            <th>Challenge</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in daily_tracking %}
+                        <tr>
+                            <td>{{ d.full_name }}</td>
+                            <td>{{ d.track_date }}</td>
+                            <td>{% if d.water_completed %}✅{% else %}❌{% endif %}</td>
+                            <td>{% if d.food_completed %}✅{% else %}❌{% endif %}</td>
+                            <td>{% if d.workout_completed %}✅{% else %}❌{% endif %}</td>
+                            <td>{% if d.challenge_completed %}✅{% else %}❌{% endif %}</td>
+                            <td>
+                                <div class="progress progress-sm">
+                                    <div class="progress-bar bg-success" style="width: {{ d.progress_percent }}%;">
+                                        {{ d.progress_percent }}%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No tracking data for today.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

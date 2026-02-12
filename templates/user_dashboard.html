@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block content %}
+<h3 class="mb-3">Hi, {{ user.full_name }} 👋</h3>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">BMI Calculator</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Height (cm)</label>
+                            <input type="number" step="0.1" name="height_cm" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Weight (kg)</label>
+                            <input type="number" step="0.1" name="weight_kg" class="form-control" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Calculate BMI</button>
+                </form>
+
+                {% if bmi_result %}
+                <hr>
+                <p class="mb-1">Your BMI:</p>
+                <h2 class="fw-bold">{{ bmi_result }}</h2>
+                <p class="mb-1">Category:</p>
+                <span class="badge bmi-badge bmi-{{ bmi_category|lower|replace(' ','-') }}">
+                    {{ bmi_category }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if weekly_food_plan and daily_workout_plan %}
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">AI-Generated Personalized Plan</h5>
+            </div>
+            <div class="card-body small">
+                <p><strong>Suggested Water Intake:</strong> {{ water_target }} L/day</p>
+                <p><strong>Suggested Daily Calories:</strong> {{ calorie_target }} kcal/day</p>
+                <hr>
+                <h6>Weekly Food Plan</h6>
+                <pre class="small bg-light p-2 rounded">{{ weekly_food_plan }}</pre>
+                <h6>Daily Workout Plan</h6>
+                <pre class="small bg-light p-2 rounded">{{ daily_workout_plan }}</pre>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Today’s Tracking</h5>
+                <small class="text-muted">Mark items as completed</small>
+            </div>
+            <div class="card-body">
+                <form id="tracking-form">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="water_completed"
+                               {% if tracking.water_completed %}checked{% endif %}>
+                        <label class="form-check-label" for="water_completed">
+                            Water Intake Completed
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="food_completed"
+                               {% if tracking.food_completed %}checked{% endif %}>
+                        <label class="form-check-label" for="food_completed">
+                            Food Target Completed
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="workout_completed"
+                               {% if tracking.workout_completed %}checked{% endif %}>
+                        <label class="form-check-label" for="workout_completed">
+                            Workout Completed
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="challenge_completed"
+                               {% if tracking.challenge_completed %}checked{% endif %}>
+                        <label class="form-check-label" for="challenge_completed">
+                            Daily Health Challenge Completed
+                        </label>
+                    </div>
+                </form>
+
+                <p class="mb-1"><strong>Progress</strong></p>
+                <div class="progress progress-lg mb-2">
+                    <div id="progress-bar" class="progress-bar bg-success"
+                         style="width: {{ tracking.progress_percent }}%;">
+                        {{ tracking.progress_percent }}%
+                    </div>
+                </div>
+                <div id="tracking-message" class="small text-muted">
+                    {% if tracking.progress_percent == 100 %}
+                        Congratulations! You have completed all your health goals for today.
+                    {% elif tracking.progress_percent >= 50 %}
+                        Great job. You're more than halfway there – keep going!
+                    {% elif tracking.progress_percent > 0 %}
+                        Good start! Keep ticking off your goals.
+                    {% else %}
+                        Start by completing one small task now.
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Reminders</h6>
+            </div>
+            <div class="card-body small">
+                <ul class="list-unstyled mb-0">
+                    {% for r in global_reminders %}
+                    <li class="mb-1">
+                        <span class="badge bg-warning text-dark me-2">Reminder</span>{{ r }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Motivational Messages</h6>
+            </div>
+            <div class="card-body small">
+                <p><strong>System Message (Target Status):</strong> {{ motivational_message }}</p>
+                {% if improvement_message %}
+                    <p><strong>Improvement Analytics:</strong> {{ improvement_message }}</p>
+                {% endif %}
+                <hr>
+                <p><strong>Admin Messages:</strong></p>
+                {% if admin_messages %}
+                    <ul class="list-unstyled">
+                        {% for m in admin_messages %}
+                            <li class="mb-2">
+                                <span class="badge bg-info me-1">Admin</span>
+                                {{ m.message }}
+                                <div class="text-muted small">{{ m.created_at }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No messages from admin yet.</p>
+                {% endif %}
+                <hr>
+                <p class="mb-0"><strong>Quote of the Day:</strong> "{{ quote.quote_text }}" – {{ quote.author }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

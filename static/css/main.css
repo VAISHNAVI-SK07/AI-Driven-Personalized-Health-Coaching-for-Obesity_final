@@ -1,0 +1,44 @@
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.stat-card {
+    border-left: 4px solid #0d6efd;
+}
+
+.bmi-badge {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+}
+
+/* Color indicators per BMI category */
+.bmi-underweight {
+    background-color: #0dcaf0;
+}
+.bmi-normal {
+    background-color: #198754;
+}
+.bmi-overweight {
+    background-color: #ffc107;
+    color: #212529;
+}
+.bmi-obese {
+    background-color: #fd7e14;
+}
+.bmi-severely-obese {
+    background-color: #dc3545;
+}
+
+.progress-lg {
+    height: 1.5rem;
+}
+
+.progress-sm {
+    height: 0.75rem;
+}
+
+pre {
+    white-space: pre-wrap;
+    font-size: 0.85rem;
+}
+
