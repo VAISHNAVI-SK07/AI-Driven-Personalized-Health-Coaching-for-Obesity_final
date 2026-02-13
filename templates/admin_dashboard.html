@@ -52,15 +52,22 @@
                             </td>
                             <td>{{ u.target_status }}</td>
                             <td>
-                                <form method="post" action="{{ url_for('admin_update_target') }}" class="d-flex gap-1">
-                                    <input type="hidden" name="user_id" value="{{ u.id }}">
-                                    <select name="target_status" class="form-select form-select-sm">
-                                        <option value="Ongoing" {% if u.target_status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
-                                        <option value="Completed" {% if u.target_status == 'Completed' %}selected{% endif %}>Completed</option>
-                                        <option value="Not Completed" {% if u.target_status == 'Not Completed' %}selected{% endif %}>Not Completed</option>
-                                    </select>
-                                    <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
-                                </form>
+                                <div class="d-flex gap-1">
+                                    <form method="post" action="{{ url_for('admin_update_target') }}" class="d-flex gap-1">
+                                        <input type="hidden" name="user_id" value="{{ u.id }}">
+                                        <select name="target_status" class="form-select form-select-sm">
+                                            <option value="Ongoing" {% if u.target_status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
+                                            <option value="Completed" {% if u.target_status == 'Completed' %}selected{% endif %}>Completed</option>
+                                            <option value="Not Completed" {% if u.target_status == 'Not Completed' %}selected{% endif %}>Not Completed</option>
+                                        </select>
+                                        <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
+                                    </form>
+
+                                    <form method="post" action="{{ url_for('admin_delete_user') }}" onsubmit="return confirm('Delete this user? This action cannot be undone.');">
+                                        <input type="hidden" name="user_id" value="{{ u.id }}">
+                                        <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}

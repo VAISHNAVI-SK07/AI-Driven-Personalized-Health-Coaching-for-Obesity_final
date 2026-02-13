@@ -23,7 +23,9 @@
                 <h5 class="card-title">Daily Motivational Quote</h5>
                 <blockquote class="blockquote mb-0">
                     <p class="mb-1">"{{ quote.quote_text }}"</p>
-                    <footer class="blockquote-footer">{{ quote.author }}</footer>
+                    {% if quote.author and quote.author != 'Unknown' %}
+                        <footer class="blockquote-footer">&mdash; {{ quote.author }}</footer>
+                    {% endif %}
                 </blockquote>
             </div>
         </div>

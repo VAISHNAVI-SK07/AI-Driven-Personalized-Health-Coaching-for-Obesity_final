@@ -42,3 +42,57 @@ pre {
     font-size: 0.85rem;
 }
 
+/* Layout / alignment improvements for base.html */
+/* Ensure navbar brand and nav items are vertically centered */
+.navbar-brand,
+.navbar-nav .nav-link {
+    display: flex;
+    align-items: center;
+}
+
+/* Constrain main container width for better centering and readability */
+.container {
+    max-width: 1100px;
+}
+
+/* Make footer content centered and slightly muted */
+footer .container {
+    text-align: center;
+    color: #6c757d;
+}
+
+/* Tweak spacing for alerts inside the container */
+.alert {
+    margin-bottom: 0.75rem;
+}
+
+/* Utility: center block-level content if needed */
+.content-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Quote styling improvements */
+.blockquote {
+    margin: 0;
+}
+.blockquote p {
+    font-size: 1.05rem;
+    line-height: 1.4;
+}
+.blockquote-footer {
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+/* Improve content spacing on large screens */
+@media (min-width: 992px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+

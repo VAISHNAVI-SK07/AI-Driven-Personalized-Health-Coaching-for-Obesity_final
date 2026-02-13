@@ -152,7 +152,11 @@
                     <p class="text-muted mb-0">No messages from admin yet.</p>
                 {% endif %}
                 <hr>
-                <p class="mb-0"><strong>Quote of the Day:</strong> "{{ quote.quote_text }}" – {{ quote.author }}</p>
+                <p class="mb-0"><strong>Quote of the Day:</strong> "{{ quote.quote_text }}"
+                    {% if quote.author and quote.author != 'Unknown' %}
+                        &nbsp;&ndash;&nbsp;{{ quote.author }}
+                    {% endif %}
+                </p>
             </div>
         </div>
     </div>

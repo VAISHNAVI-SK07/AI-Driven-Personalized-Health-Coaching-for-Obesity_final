@@ -477,6 +477,39 @@ def create_app():
 
         return redirect(url_for("admin_dashboard"))
 
+    @app.route("/admin/delete_user", methods=["POST"])
+    @login_required(role="admin")
+    def admin_delete_user():
+        """Delete a user and related records (simple cascade).
+
+        This performs basic cleanup of related tables to avoid foreign key errors.
+        """
+        user_id = request.form.get("user_id")
+        if not user_id:
+            flash("User selection required.", "warning")
+            return redirect(url_for("admin_dashboard"))
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            # Attempt to remove related records first to avoid FK constraints
+            cursor.execute("DELETE FROM bmi_records WHERE user_id = %s", (user_id,))
+            cursor.execute("DELETE FROM daily_tracking WHERE user_id = %s", (user_id,))
+            cursor.execute("DELETE FROM admin_messages WHERE user_id = %s", (user_id,))
+            cursor.execute("DELETE FROM login_logs WHERE user_id = %s", (user_id,))
+            # Finally remove the user
+            cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+            conn.commit()
+            flash("User deleted successfully.", "success")
+        except Error:
+            conn.rollback()
+            flash("Failed to delete user. Check database constraints.", "danger")
+        finally:
+            cursor.close()
+            conn.close()
+
+        return redirect(url_for("admin_dashboard"))
+
     @app.route("/admin/update_target", methods=["POST"])
     @login_required(role="admin")
     def admin_update_target():
@@ -684,7 +717,8 @@ def create_app():
     return app
 
 
+app = create_app()
+
 if __name__ == "__main__":
-    app = create_app()
     app.run(debug=True)
 
